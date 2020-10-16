@@ -24,7 +24,7 @@ dirs = {
 def ray(origin: (int, int), dir: int, limit: int) -> list:
     results = []  # list of intersected squares, tuples
 
-    for i in range(1,limit):
+    for i in range(1, limit):
         results.append((origin[0] + dirs[dir][0] * i,
                         origin[1] + dirs[dir][1] * i))
     return results
@@ -36,8 +36,10 @@ def normalize(vector: (float, float)) -> (float, float):
     return (vector[0] / norm, vector[1]/norm)
     # represents piece on chess board
 
-#Coords to chess coord system converter
-def crtochs(coords: (int,int) or List[Tuple[int,int]]) -> str or List[str]:
+# Coords to chess coord system converter
+
+
+def crtochs(coords: (int, int) or List[Tuple[int, int]]) -> str or List[str]:
     if type(coords) is tuple:
         return chr(65 + coords[0]) + str(coords[1]+1)
     elif type(coords) is list:
@@ -46,9 +48,11 @@ def crtochs(coords: (int,int) or List[Tuple[int,int]]) -> str or List[str]:
             l.append(crtochs(coords[i]))
         return l
 
+
 class Piece:
-    def __init__(self, piece_id: str):
+    def __init__(self, piece_id: str, coords: (int, int)):
         self.type = piece_id
+        self.coords = coords
 
     def __str__(self) -> str:
         return self.type
@@ -60,9 +64,9 @@ class Board:
 
     def __init__(self):
         self.data = [[0 for x in range(self.W)] for y in range(self.H)]
-        self.move_methods = {
-            "q":  self.__move_queen,
-            "k": self.__move_king,
+        self.move_methods = { #move method bindings for given figures
+            "q":  self.__moves_queen,
+            "k": self.__moves_king,
         }
 
     # place piece of given piece ID on x,y position
@@ -75,7 +79,7 @@ class Board:
         if self.data[x][y] != 0:
             raise Exception('Piece already exists at this position')
 
-        p = Piece(piece_id)
+        p = Piece(piece_id, (x, y))
         self.data[x][y] = p
 
     def remove_piece(self, coords: (int, int)):
@@ -83,6 +87,7 @@ class Board:
         y = coords[1]
         if x > 7 or x < 0 or y > 7 or y < 0:
             raise Exception('Piece position out of bounds')
+        self.data[x][y].coords = (-1, -1)
         self.data[x][y] = 0
 
     def get_pieces(self) -> list:
@@ -105,7 +110,7 @@ class Board:
         return None
 
     # move definitions
-    def __move_queen(self, coords: (int, int)) -> list:
+    def __moves_queen(self, coords: (int, int)) -> list:
         # queen moves diagonally, forward, backwards, left, right in rays
         x = coords[0]
         y = coords[1]
@@ -118,11 +123,14 @@ class Board:
                 self.data[x][y], ray(coords, i, 9)))
         return moves
 
-    def __move_king(self, coords: (int, int)) -> list:
+    def __moves_king(self, coords: (int, int)) -> list:
         moves = []
-
-
-        return None
+        # king can move 1 square in every direction, but cannot move on fields that will result in check
+        for d in dirs.values(): 
+            nc = (d[0] + coords[0], d[1] + coords[1])
+            if self.check_check(nc) == False:
+                moves.append(nc)
+        return moves
 
     # this method accepts RAY list (so only one avenue of move, not WHOLE array of every move) and then checks it against the board, to determine cutoff points
 
@@ -144,18 +152,32 @@ class Board:
                     break
         return result
 
+    # checks if check can occur with current game state on given position
+    def check_check(self, coords: (int, int)) -> bool:
+        # get all pieces
+        pieces = self.get_pieces()
+        for i in range(len(pieces)):
+            if pieces[i].type.lower() == "k":
+                continue
+            # get all contested squares
+            csqs = self.get_moves(pieces[i].coords)
+            for csq in csqs:
+                if coords == csq:  # if chosen coord is contested
+                    return True
+        return False
+
     def __str__(self) -> str:
         s = ""
-        for j in range(self.H-1,-1,-1):
+        for j in range(self.H-1, -1, -1):
             s += "\n"
             s += str(j+1) + "|"
             for i in range(self.W):
                 s += str(self.data[i][j])
-    
+
         s += "\n  --------\n  "
         for i in range(self.W):
             s += chr(i + 65)
-        
+
         return s
 
 
@@ -165,6 +187,7 @@ b.remove_piece((1, 1))
 b.place_piece("q", (1, 1))
 b.place_piece("K", (3, 3))
 
-print(crtochs (b.get_moves((1, 1))))
+print(crtochs(b.get_moves((1, 1))))
+print(crtochs(b.get_moves((3, 3))))
 print(b)
 print(b.get_pieces())
