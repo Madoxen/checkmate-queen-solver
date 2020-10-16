@@ -1,5 +1,7 @@
 import math
 
+# TODO: simplify ID system
+# white -> lower case ; black -> upper case
 PIECE_REPR = [None, "p", "n", "b", "r", "q", "k", "P", "N", "B", "R", "Q", "K"]
 
 dirs = {
@@ -20,7 +22,7 @@ dirs = {
 def ray(origin: (int, int), dir: int, limit: int) -> list:
     results = []  # list of intersected squares, tuples
 
-    for i in range(limit):
+    for i in range(1,limit):
         results.append((origin[0] + dirs[dir][0] * i,
                         origin[1] + dirs[dir][1] * i))
     return results
@@ -34,11 +36,11 @@ def normalize(vector: (float, float)) -> (float, float):
 
 
 class Piece:
-    def __init__(self, piece_id: int):
+    def __init__(self, piece_id: str):
         self.type = piece_id
 
     def __str__(self) -> str:
-        return PIECE_REPR[self.type]
+        return self.type
 
 
 # represents chess board 8x8
@@ -54,9 +56,7 @@ class Board:
 
     # place piece of given piece ID on x,y position
     # both x and y must be: > 0 and < 8
-    # TODO: change position arugments to tuples
-
-    def place_piece(self, piece_id: int, coords: (int, int)) -> None:
+    def place_piece(self, piece_id: str, coords: (int, int)) -> None:
         x = coords[0]
         y = coords[1]
         if x > 7 or x < 0 or y > 7 or y < 0:
@@ -67,15 +67,12 @@ class Board:
         p = Piece(piece_id)
         self.data[x][y] = p
 
-    # TODO: change position arugments to tuples
     def remove_piece(self, coords: (int, int)):
         x = coords[0]
         y = coords[1]
         if x > 7 or x < 0 or y > 7 or y < 0:
             raise Exception('Piece position out of bounds')
         self.data[x][y] = 0
-
-    # TODO: change position arugments to tuples
 
     def get_pieces(self) -> list:
         l = []
@@ -93,11 +90,10 @@ class Board:
             raise Exception('Piece position out of bounds')
         p = self.data[x][y]
         if p != 0:
-            return self.move_methods[PIECE_REPR[p.type].lower()](coords)
+            return self.move_methods[p.type.lower()](coords)
         return None
 
     # move definitions
-
     def __move_queen(self, coords: (int, int)) -> list:
         # queen moves diagonally, forward, backwards, left, right in rays
         x = coords[0]
@@ -109,11 +105,13 @@ class Board:
         for i in range(8):
             moves.extend(self.__raycast_move(
                 self.data[x][y], ray(coords, i, 9)))
+        return moves
 
     def __move_king(self, coords: (int, int)) -> list:
         return None
 
     # this method accepts RAY list (so only one avenue of move, not WHOLE array of every move) and then checks it against the board, to determine cutoff points
+
     def __raycast_move(self, piece: Piece, ray: list) -> list:
         result = []
         for i in range(len(ray)):
@@ -122,8 +120,8 @@ class Board:
             if x > 7 or x < 0 or y > 7 or y < 0:
                 result = ray[:i]
                 break  # if out of bounds, cut now including current square
-            if self.data[x][y] is str:
-                if self.data[x][y].isupper() == PIECE_REPR[piece.type].isupper() or self.data[x][y].islower() == PIECE_REPR[piece.type].islower():
+            if type(self.data[x][y]) is Piece:
+                if self.data[x][y].type.isupper() == piece.type.isupper() or self.data[x][y].type.islower() == piece.type.islower():
                     result = ray[:i]
                     break  # if encountered our piece, cut now including current square
                 else:
@@ -142,9 +140,10 @@ class Board:
 
 
 b = Board()
-b.place_piece(1, (1, 1))
+b.place_piece("q", (1, 1))
 b.remove_piece((1, 1))
-b.place_piece(5, (1, 1))
+b.place_piece("q", (1, 1))
+b.place_piece("K", (3, 3))
 print(b.get_moves((1, 1)))
 
 print(b)
