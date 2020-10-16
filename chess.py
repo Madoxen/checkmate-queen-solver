@@ -107,7 +107,8 @@ class Board:
             raise Exception("There is no queen on given position")
 
         for i in range(8):
-           moves.extend(self.__raycast_move(self.data[x][y], ray(coords, i, 9)))
+            moves.extend(self.__raycast_move(
+                self.data[x][y], ray(coords, i, 9)))
 
     def __move_king(self, coords: (int, int)) -> list:
         return None
