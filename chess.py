@@ -1,4 +1,6 @@
 import math
+from typing import List, Tuple
+
 
 # TODO: simplify ID system
 # white -> lower case ; black -> upper case
@@ -34,11 +36,15 @@ def normalize(vector: (float, float)) -> (float, float):
     return (vector[0] / norm, vector[1]/norm)
     # represents piece on chess board
 
-
-def crtochs(coords: (int,int)) -> str:
-    return chr(65 + coords[0]) + str(coords[1])
-
-
+#Coords to chess coord system converter
+def crtochs(coords: (int,int) or List[Tuple[int,int]]) -> str or List[str]:
+    if type(coords) is tuple:
+        return chr(65 + coords[0]) + str(coords[1]+1)
+    elif type(coords) is list:
+        l = []
+        for i in range(len(coords)):
+            l.append(crtochs(coords[i]))
+        return l
 
 class Piece:
     def __init__(self, piece_id: str):
@@ -159,6 +165,6 @@ b.remove_piece((1, 1))
 b.place_piece("q", (1, 1))
 b.place_piece("K", (3, 3))
 
-print(b.get_moves((1, 1)))
+print(crtochs (b.get_moves((1, 1))))
 print(b)
 print(b.get_pieces())
