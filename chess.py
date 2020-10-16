@@ -108,6 +108,9 @@ class Board:
         return moves
 
     def __move_king(self, coords: (int, int)) -> list:
+        moves = []
+
+
         return None
 
     # this method accepts RAY list (so only one avenue of move, not WHOLE array of every move) and then checks it against the board, to determine cutoff points
@@ -132,10 +135,10 @@ class Board:
 
     def __str__(self) -> str:
         s = ""
-        for j in range(self.W):
+        for j in range(self.H-1,-1,-1):
             s += "\n"
-            for i in range(self.H):
-                s += str(self.data[j][i])
+            for i in range(self.W):
+                s += str(self.data[i][j])
         return s
 
 
@@ -144,6 +147,7 @@ b.place_piece("q", (1, 1))
 b.remove_piece((1, 1))
 b.place_piece("q", (1, 1))
 b.place_piece("K", (3, 3))
+
 print(b.get_moves((1, 1)))
 
 print(b)
