@@ -30,15 +30,6 @@ def ray(origin: (int, int), dir: int, limit: int) -> list:
     return results
 
 
-def normalize(vector: (float, float)) -> (float, float):
-    # calc norm
-    norm = math.sqrt(vector[0]**2 + vector[1]**2)
-    return (vector[0] / norm, vector[1]/norm)
-    # represents piece on chess board
-
-# Coords to chess coord system converter
-
-
 def crtochs(coords: (int, int) or List[Tuple[int, int]]) -> str or List[str]:
     if type(coords) is tuple:
         return chr(65 + coords[0]) + str(coords[1]+1)
@@ -64,7 +55,7 @@ class Board:
 
     def __init__(self):
         self.data = [[0 for x in range(self.W)] for y in range(self.H)]
-        self.move_methods = { #move method bindings for given pieces
+        self.move_methods = {  # move method bindings for given pieces
             "q":  self.__moves_queen,
             "k": self.__moves_king,
         }
@@ -125,10 +116,12 @@ class Board:
 
     def __moves_king(self, coords: (int, int)) -> list:
         moves = []
+        x = coords[0]
+        y = coords[1]
         # king can move 1 square in every direction, but cannot move on fields that will result in check
-        for d in dirs.values(): 
-            nc = (d[0] + coords[0], d[1] + coords[1])
-            if self.check_check(nc) == False:
+        for d in dirs.values():
+            nc = (d[0] + x, d[1] + y)
+            if self.check_check(nc, self.data[x][y].type) == False:
                 moves.append(nc)
         return moves
 
@@ -143,7 +136,8 @@ class Board:
                 result = ray[:i]
                 break  # if out of bounds, cut now including current square
             if type(self.data[x][y]) is Piece:
-                if self.data[x][y].type.isupper() == piece.type.isupper() or self.data[x][y].type.islower() == piece.type.islower(): #we check colour by checking case of piece
+                # we check colour by checking case of piece
+                if self.data[x][y].type.isupper() == piece.type.isupper() or self.data[x][y].type.islower() == piece.type.islower():
                     result = ray[:i]
                     break  # if encountered our piece, cut now including current square
                 else:
@@ -153,14 +147,23 @@ class Board:
         return result
 
     # checks if check can occur with current game state on given position
-    def check_check(self, coords: (int, int)) -> bool:
+    def check_check(self, coords: (int, int), king: str) -> bool:
         # get all pieces
         pieces = self.get_pieces()
-        for i in range(len(pieces)):
-            if pieces[i].type.lower() == "k":
+        for p in pieces:
+            if p.type == king: #we need to eliminate checked King from piece pool to avoid infinite recursive loop
+                pieces.remove(p)
                 continue
+
+            csqs = []
             # get all contested squares
-            csqs = self.get_moves(pieces[i].coords)
+            if(p.type.lower() == "k"):
+                for d in dirs.values():
+                    csqs.append((d[0] + p.coords[0], d[1] + p.coords[1]))
+            else:
+                csqs = self.get_moves(p.coords)
+
+
             for csq in csqs:
                 if coords == csq:  # if chosen coord is contested
                     return True
@@ -177,7 +180,6 @@ class Board:
         s += "\n  --------\n  "
         for i in range(self.W):
             s += chr(i + 65)
-
         return s
 
 
@@ -186,9 +188,10 @@ b.place_piece("q", (1, 1))
 b.remove_piece((1, 1))
 b.place_piece("q", (1, 1))
 b.place_piece("K", (3, 3))
+b.place_piece("k", (1, 3))
 
 print(crtochs(b.get_moves((1, 1))))
 print(crtochs(b.get_moves((3, 3))))
 print(b)
 print(b.get_pieces())
-print(b.check_check((3,3)))
+print(b.check_check((3, 3), "K"))
