@@ -35,6 +35,11 @@ def normalize(vector: (float, float)) -> (float, float):
     # represents piece on chess board
 
 
+def crtochs(coords: (int,int)) -> str:
+    return chr(65 + coords[0]) + str(coords[1])
+
+
+
 class Piece:
     def __init__(self, piece_id: str):
         self.type = piece_id
@@ -137,8 +142,14 @@ class Board:
         s = ""
         for j in range(self.H-1,-1,-1):
             s += "\n"
+            s += str(j+1) + "|"
             for i in range(self.W):
                 s += str(self.data[i][j])
+    
+        s += "\n  --------\n  "
+        for i in range(self.W):
+            s += chr(i + 65)
+        
         return s
 
 
