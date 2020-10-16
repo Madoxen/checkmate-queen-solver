@@ -64,7 +64,7 @@ class Board:
 
     def __init__(self):
         self.data = [[0 for x in range(self.W)] for y in range(self.H)]
-        self.move_methods = { #move method bindings for given figures
+        self.move_methods = { #move method bindings for given pieces
             "q":  self.__moves_queen,
             "k": self.__moves_king,
         }
@@ -74,7 +74,7 @@ class Board:
     def place_piece(self, piece_id: str, coords: (int, int)) -> None:
         x = coords[0]
         y = coords[1]
-        if x > 7 or x < 0 or y > 7 or y < 0:
+        if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
             raise Exception('Piece position out of bounds')
         if self.data[x][y] != 0:
             raise Exception('Piece already exists at this position')
@@ -85,7 +85,7 @@ class Board:
     def remove_piece(self, coords: (int, int)):
         x = coords[0]
         y = coords[1]
-        if x > 7 or x < 0 or y > 7 or y < 0:
+        if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
             raise Exception('Piece position out of bounds')
         self.data[x][y].coords = (-1, -1)
         self.data[x][y] = 0
@@ -102,7 +102,7 @@ class Board:
     def get_moves(self, coords: (int, int)) -> list:
         x = coords[0]
         y = coords[1]
-        if x > 7 or x < 0 or y > 7 or y < 0:
+        if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
             raise Exception('Piece position out of bounds')
         p = self.data[x][y]
         if p != 0:
@@ -139,11 +139,11 @@ class Board:
         for i in range(len(ray)):
             x = ray[i][0]
             y = ray[i][1]
-            if x > 7 or x < 0 or y > 7 or y < 0:
+            if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
                 result = ray[:i]
                 break  # if out of bounds, cut now including current square
             if type(self.data[x][y]) is Piece:
-                if self.data[x][y].type.isupper() == piece.type.isupper() or self.data[x][y].type.islower() == piece.type.islower():
+                if self.data[x][y].type.isupper() == piece.type.isupper() or self.data[x][y].type.islower() == piece.type.islower(): #we check colour by checking case of piece
                     result = ray[:i]
                     break  # if encountered our piece, cut now including current square
                 else:
@@ -191,3 +191,4 @@ print(crtochs(b.get_moves((1, 1))))
 print(crtochs(b.get_moves((3, 3))))
 print(b)
 print(b.get_pieces())
+print(b.check_check((3,3)))
