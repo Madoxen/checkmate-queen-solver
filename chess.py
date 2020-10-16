@@ -78,7 +78,7 @@ class Board:
         l = []
         for i in range(self.W):
             for j in range(self.H):
-                if self.data[i][j] is Piece:
+                if type(self.data[i][j]) is Piece:
                     l.append(self.data[i][j])
         return l
 
@@ -149,7 +149,5 @@ b.place_piece("q", (1, 1))
 b.place_piece("K", (3, 3))
 
 print(b.get_moves((1, 1)))
-
 print(b)
-
 print(b.get_pieces())
