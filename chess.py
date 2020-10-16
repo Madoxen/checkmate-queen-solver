@@ -39,6 +39,16 @@ def crtochs(coords: (int, int) or List[Tuple[int, int]]) -> str or List[str]:
             l.append(crtochs(coords[i]))
         return l
 
+def chstocr(coord : str or List[str]) -> (int,int):
+    if type(coord) is str:
+        if len(coord) > 2:
+            raise Exception("Chess coords are 2 chars long")
+        return( ord(coord[0]) - 65 , int(coord[1]) - int('1'))
+    elif type(coord) is list:
+        l = []
+        for c in coord:
+            l.append(chstocr(c))
+        return l
 
 class Piece:
     def __init__(self, piece_id: str, coords: (int, int)):
