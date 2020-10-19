@@ -179,29 +179,32 @@ class Board:
                     return True
         return False
 
+    def check_mate(self, coords: (int, int), king: str) -> bool:
+        return not self.get_moves(coords)
+
     def __str__(self) -> str:
         s = ""
         for j in range(self.H-1, -1, -1):
             s += "\n"
             s += str(j+1) + "|"
             for i in range(self.W):
-                s += str(self.data[i][j])
+                s += str( self.data[i][j] ) + " "
 
-        s += "\n  --------\n  "
+        s += "\n  - - - - - - - -\n  "
         for i in range(self.W):
-            s += chr(i + 65)
+            s += str(chr(i + 65)) + " "
         return s
 
 
 b = Board()
-b.place_piece("q", (1, 1))
-b.remove_piece((1, 1))
-b.place_piece("q", (1, 1))
-b.place_piece("K", (3, 3))
-b.place_piece("k", (1, 3))
+b.place_piece("q", (4, 7))
+b.place_piece("K", (7, 7))
+b.place_piece("k", (7, 5))
 
 print(crtochs(b.get_moves((1, 1))))
 print(crtochs(b.get_moves((3, 3))))
 print(b)
-print(b.get_pieces())
+
+print([str(i) for i in b.get_pieces()])
 print(b.check_check((3, 3), "K"))
+print(b.check_mate((3, 3), "K"))
