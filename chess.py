@@ -91,11 +91,23 @@ class Board:
         self.data[x][y].coords = (-1, -1)
         self.data[x][y] = 0
 
-    def get_pieces(self) -> list:
+    #TODO: Gets pieces that are on board
+    #Gets all pieces on board if king is set to ""
+    #Gets all pieces of given king if set to k or K
+    def get_pieces(self, king: str = "") -> list:
+        if king != "k" and king != "K" and king != "":
+            king = ""
+
         l = []
+        d = {
+            "K" : lambda x: x.isupper(),
+            "k" : lambda x: x.islower(),
+            "" : lambda x: True 
+        }
+
         for i in range(self.W):
             for j in range(self.H):
-                if type(self.data[i][j]) is Piece:
+                if type(self.data[i][j]) is Piece and d[king](self.data[i][j].type):
                     l.append(self.data[i][j])
         return l
 
@@ -128,15 +140,26 @@ class Board:
         moves = []
         x = coords[0]
         y = coords[1]
+        
+        #remove king from board
+        king = self.data[x][y]
+        self.remove_piece(coords)
+        #produce all contested squares
+        csqs = self.__produce_csqs(king.type)
+        #place king on it's square back again
+        self.place_piece(king.type, coords) 
+
+
         # king can move 1 square in every direction, but cannot move on fields that will result in check
         for d in dirs.values():
-            nc = (d[0] + x, d[1] + y)
-            if self.check_check(nc, self.data[x][y].type) == False:
+            nc = (d[0] + x, d[1] + y) #new coords
+            if nc not in csqs: 
+                if nc[0] > self.W-1 or nc[0] < 0 or nc[1] > self.H-1 or nc[1] < 0: #bound check
+                    continue
                 moves.append(nc)
         return moves
 
     # this method accepts RAY list (so only one avenue of move, not WHOLE array of every move) and then checks it against the board, to determine cutoff points
-
     def __raycast_move(self, piece: Piece, ray: list) -> list:
         result = []
         for i in range(len(ray)):
@@ -157,30 +180,32 @@ class Board:
         return result
 
     # checks if check can occur with current game state on given position
-    def check_check(self, coords: (int, int), king: str) -> bool:
+    def __produce_csqs(self, king: str) -> bool:
         # get all pieces
-        pieces = self.get_pieces()
+        pieces = self.get_pieces(king.swapcase()) #we want to get all possible moves, of the opposite side
+        csqs = []
         for p in pieces:
-            if p.type == king: #we need to eliminate checked King from piece pool to avoid infinite recursive loop
-                pieces.remove(p)
-                continue
-
-            csqs = []
             # get all contested squares
             if(p.type.lower() == "k"):
                 for d in dirs.values():
-                    csqs.append((d[0] + p.coords[0], d[1] + p.coords[1]))
+                    x = d[0] + p.coords[0]
+                    y = d[1] + p.coords[1]
+                    csqs.append((x, y))
             else:
-                csqs = self.get_moves(p.coords)
+                csqs.extend(self.get_moves(p.coords))
+        return csqs
 
-
-            for csq in csqs:
-                if coords == csq:  # if chosen coord is contested
-                    return True
+    def check_check(self, coords: (int,int), king:str):
+        csqs = self.__produce_csqs(king)
+        for csq in csqs:
+            if coords == csq:  # if chosen coord is contested
+                return True
         return False
 
     def check_mate(self, coords: (int, int), king: str) -> bool:
-        return not self.get_moves(coords)
+        if not self.get_moves(coords) and b.check_check(coords, king):
+            return True
+        return False
 
     def __str__(self) -> str:
         s = ""
@@ -198,13 +223,11 @@ class Board:
 
 b = Board()
 b.place_piece("q", (4, 7))
-b.place_piece("K", (7, 7))
+b.place_piece("K", (1, 3))
 b.place_piece("k", (7, 5))
 
-print(crtochs(b.get_moves((1, 1))))
-print(crtochs(b.get_moves((3, 3))))
 print(b)
 
-print([str(i) for i in b.get_pieces()])
-print(b.check_check((3, 3), "K"))
-print(b.check_mate((3, 3), "K"))
+
+print(b.check_check((4, 3), "K"))
+print(b.check_mate((4, 3), "K"))
