@@ -149,7 +149,6 @@ class Board:
         #place king on it's square back again
         self.place_piece(king.type, coords) 
 
-
         # king can move 1 square in every direction, but cannot move on fields that will result in check
         for d in dirs.values():
             nc = (d[0] + x, d[1] + y) #new coords
@@ -223,11 +222,17 @@ class Board:
 
 b = Board()
 b.place_piece("q", (4, 7))
-b.place_piece("K", (1, 3))
+b.place_piece("K", (6, 7))
 b.place_piece("k", (7, 5))
+
+
+print(crtochs(b.get_moves((5,7))))
+
 
 print(b)
 
 
-print(b.check_check((4, 3), "K"))
-print(b.check_mate((4, 3), "K"))
+
+
+print(b.check_check((6, 7), "K"))
+print(b.check_mate((6, 7), "K"))
