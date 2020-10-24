@@ -1,6 +1,6 @@
 import math
 from typing import List, Tuple
-
+import copy
 
 # TODO: simplify ID system
 # white -> lower case ; black -> upper case
@@ -90,6 +90,15 @@ class Board:
             raise Exception('Piece position out of bounds')
         self.data[x][y].coords = (-1, -1)
         self.data[x][y] = 0
+
+    def move_piece(self, _from:(int,int), _to:(int,int)):
+        t = self.data[_from[0]][_from[1]].type
+        if _to not in self.get_moves(_from):
+            raise Exception('Invalid move for this piece')
+        else:
+            self.remove_piece(_from)
+            self.place_piece(t,_to)
+
 
     #TODO: Gets pieces that are on board
     #Gets all pieces on board if king is set to ""
@@ -202,6 +211,7 @@ class Board:
         return False
 
     def check_mate(self, coords: (int, int), king: str) -> bool:
+        print(coords,king)
         if not self.get_moves(coords) and b.check_check(coords, king):
             return True
         return False
@@ -220,19 +230,35 @@ class Board:
         return s
 
 
+    def get_mating_moves(self, coords: (int, int), king_coords: (int,int)):
+        moves = self.get_moves(coords)
+        print("moves: ",moves)
+        king=self.data[king_coords[0]][king_coords[1]].type
+        if king is not "k" and king is not "K":
+            raise Exception('provided king is not a king')
+
+        mating = []
+        for move in moves:
+            sub = copy.deepcopy(self)
+            sub.move_piece(coords,move)
+            print(sub, sub.check_mate(king_coords,king), move, king_coords, king)
+            if sub.check_mate(king_coords,king):
+                mating.add(move)
+
+        return mating
+
 b = Board()
-b.place_piece("q", (4, 7))
+b.place_piece("q", (4, 3))
 b.place_piece("K", (6, 7))
 b.place_piece("k", (7, 5))
 
 
-print(crtochs(b.get_moves((5,7))))
 
 
-print(b)
-
+print(crtochs(b.get_mating_moves((4,3),(6,7))))
 
 
 
-print(b.check_check((6, 7), "K"))
-print(b.check_mate((6, 7), "K"))
+#print(b)
+
+#print(b.check_mate((6, 7), "K"))
