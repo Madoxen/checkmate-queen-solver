@@ -212,7 +212,7 @@ class Board:
 
     def check_mate(self, coords: (int, int), king: str) -> bool:
         print(coords,king)
-        if not self.get_moves(coords) and b.check_check(coords, king):
+        if not self.get_moves(coords) and self.check_check(coords, king):
             return True
         return False
 
@@ -234,7 +234,7 @@ class Board:
         moves = self.get_moves(coords)
         print("moves: ",moves)
         king=self.data[king_coords[0]][king_coords[1]].type
-        if king is not "k" and king is not "K":
+        if king != "k" and king != "K":
             raise Exception('provided king is not a king')
 
         mating = []
@@ -243,22 +243,14 @@ class Board:
             sub.move_piece(coords,move)
             print(sub, sub.check_mate(king_coords,king), move, king_coords, king)
             if sub.check_mate(king_coords,king):
-                mating.add(move)
-
+                mating.append(move)
         return mating
 
 b = Board()
-b.place_piece("q", (4, 3))
+b.place_piece("q", (3, 6))
 b.place_piece("K", (6, 7))
 b.place_piece("k", (7, 5))
 
-
-
-
-print(crtochs(b.get_mating_moves((4,3),(6,7))))
-
-
-
+print(crtochs(b.get_mating_moves((3,6),(6,7))))
 #print(b)
-
 #print(b.check_mate((6, 7), "K"))
