@@ -239,6 +239,8 @@ class Board:
 
         mating = []
         for move in moves:
+            if move == king_coords:
+                continue
             sub = copy.deepcopy(self)
             sub.move_piece(coords,move)
             print(sub, sub.check_mate(king_coords,king), move, king_coords, king)
@@ -247,10 +249,32 @@ class Board:
         return mating
 
 b = Board()
-b.place_piece("q", (3, 6))
+b.place_piece("q", (5, 5))
 b.place_piece("K", (6, 7))
 b.place_piece("k", (7, 5))
+print(b)
 
-print(crtochs(b.get_mating_moves((3,6),(6,7))))
-#print(b)
-#print(b.check_mate((6, 7), "K"))
+
+
+
+print(crtochs(b.get_mating_moves((5,5),(6,7))))
+
+
+b = Board()
+b.place_piece("q", (5, 5))
+b.place_piece("K", (6, 7))
+b.place_piece("k", (6, 5))
+print(b)
+
+print(crtochs(b.get_mating_moves((5,5),(6,7))))
+
+
+b = Board()
+b.place_piece("q", (1, 6))
+b.place_piece("K", (0, 7))
+b.place_piece("k", (2, 6))
+print(b)
+
+
+
+print(crtochs(b.get_mating_moves((1,6),(0,7))))
