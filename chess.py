@@ -241,17 +241,27 @@ class Board:
         return False
 
     def __str__(self) -> str:
-        s = ""
-        for j in range(self.H-1, -1, -1):
-            s += "\n"
-            s += str(j+1) + "|"
-            for i in range(self.W):
-                s += str( self.data[i][j] ) + " "
+        s = "   "
 
-        s += "\n  - - - - - - - -\n  "
         for i in range(self.W):
             s += str(chr(i + 65)) + " "
-        return s
+        s += "\n   | | | | | | | |  "
+        
+
+        for j in range(self.H-1, -1, -1):
+            s += "\n"
+            s += str(j+1) + "--"
+            for i in range(self.W):
+                s += str( self.data[i][j] )
+                if i<self.W-1:
+                    s+=" "
+            s += "--" + str(j+1) 
+
+        s += "\n   | | | | | | | |\n   "
+        for i in range(self.W):
+            s += str(chr(i + 65)) + " "
+        
+        return s + "\n"
 
 
     def get_mating_moves(self, coords: (int, int), king_coords: (int,int)):
@@ -274,30 +284,6 @@ class Board:
             if sub.check_mate(king_coords,king):
                 mating.append(move)
         return mating
-
-b = Board()
-b.place_piece("q", (5, 5))
-b.place_piece("K", (6, 7))
-b.place_piece("k", (7, 5))
-print(b)
-
-print(crtochs(b.get_mating_moves((5,5),(6,7))))
-
-b = Board()
-b.place_piece("q", (5, 5))
-b.place_piece("K", (6, 7))
-b.place_piece("k", (6, 5))
-print(b)
-
-print(crtochs(b.get_mating_moves((5,5),(6,7))))
-
-b = Board()
-b.place_piece("q", (1, 6))
-b.place_piece("K", (0, 7))
-b.place_piece("k", (2, 6))
-print(b)
-
-print(crtochs(b.get_mating_moves((1,6),(0,7))))
 
 b = Board()
 b.place_piece("q", "B7")
