@@ -72,7 +72,9 @@ class Board:
 
     # place piece of given piece ID on x,y position
     # both x and y must be: > 0 and < 8
-    def place_piece(self, piece_id: str, coords: (int, int)) -> None:
+    def place_piece(self, piece_id: str, coords) -> None:
+        if type(coords) is str:
+            coords = chstocr(coords)
         x = coords[0]
         y = coords[1]
         if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
@@ -83,7 +85,10 @@ class Board:
         p = Piece(piece_id, (x, y))
         self.data[x][y] = p
 
-    def remove_piece(self, coords: (int, int)):
+    def remove_piece(self, coords):
+        if type(coords) is str:
+            coords = chstocr(coords)
+
         x = coords[0]
         y = coords[1]
         if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
@@ -92,6 +97,13 @@ class Board:
         self.data[x][y] = 0
 
     def move_piece(self, _from:(int,int), _to:(int,int)):
+
+        if type(_from) is str:
+            _from = chstocr(_from)
+
+        if type(_to) is str:
+            _to = chstocr(_to)
+
         t = self.data[_from[0]][_from[1]].type
         if _to not in self.get_moves(_from):
             raise Exception('Invalid move for this piece')
@@ -122,6 +134,9 @@ class Board:
 
     # gets list of possible moves for piece on x,y position
     def get_moves(self, coords: (int, int)) -> list:
+        if type(coords) is str:
+            coords = chstocr(coords)
+
         x = coords[0]
         y = coords[1]
         if x > self.W-1 or x < 0 or y > self.H-1 or y < 0:
@@ -133,6 +148,9 @@ class Board:
 
     # move definitions
     def __moves_queen(self, coords: (int, int)) -> list:
+        if type(coords) is str:
+            coords = chstocr(coords)
+
         # queen moves diagonally, forward, backwards, left, right in rays
         x = coords[0]
         y = coords[1]
@@ -146,6 +164,9 @@ class Board:
         return moves
 
     def __moves_king(self, coords: (int, int)) -> list:
+        if type(coords) is str:
+            coords = chstocr(coords)
+
         moves = []
         x = coords[0]
         y = coords[1]
@@ -204,6 +225,8 @@ class Board:
         return csqs
 
     def check_check(self, coords: (int,int), king:str):
+        if type(coords) is str:
+            coords = chstocr(coords)
         csqs = self.__produce_csqs(king)
         for csq in csqs:
             if coords == csq:  # if chosen coord is contested
@@ -211,6 +234,8 @@ class Board:
         return False
 
     def check_mate(self, coords: (int, int), king: str) -> bool:
+        if type(coords) is str:
+            coords = chstocr(coords)
         print(coords,king)
         if not self.get_moves(coords) and self.check_check(coords, king):
             return True
@@ -231,6 +256,11 @@ class Board:
 
 
     def get_mating_moves(self, coords: (int, int), king_coords: (int,int)):
+        if type(coords) is str:
+            coords = chstocr(coords)
+        if type(king_coords) is str:
+            king_coords = chstocr(king_coords)
+
         moves = self.get_moves(coords)
         print("moves: ",moves)
         king=self.data[king_coords[0]][king_coords[1]].type
@@ -254,11 +284,7 @@ b.place_piece("K", (6, 7))
 b.place_piece("k", (7, 5))
 print(b)
 
-
-
-
 print(crtochs(b.get_mating_moves((5,5),(6,7))))
-
 
 b = Board()
 b.place_piece("q", (5, 5))
@@ -268,13 +294,25 @@ print(b)
 
 print(crtochs(b.get_mating_moves((5,5),(6,7))))
 
-
 b = Board()
 b.place_piece("q", (1, 6))
 b.place_piece("K", (0, 7))
 b.place_piece("k", (2, 6))
 print(b)
 
-
-
 print(crtochs(b.get_mating_moves((1,6),(0,7))))
+
+b = Board()
+b.place_piece("q", "B7")
+b.place_piece("K", (0, 7))
+b.place_piece("k", (2, 6))
+print(b)
+
+
+#print(crtochs(b.get_mating_moves((1,6),(0,7))))
+
+
+
+
+
+
