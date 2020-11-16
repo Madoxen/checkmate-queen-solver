@@ -248,7 +248,7 @@ class Board:
             for i in range(self.W):
                 s += str( self.data[i][j] ) + " "
 
-        s += "\n  - - - - - - - -\n  "
+        s += "\n  "
         for i in range(self.W):
             s += str(chr(i + 65)) + " "
         return s
@@ -266,13 +266,14 @@ class Board:
             raise Exception('provided king is not a king')
 
         mating = []
-        for move in moves:
-            if move == king_coords:
-                continue
-            sub = copy.deepcopy(self)
-            sub.move_piece(coords,move)
-            if sub.check_mate(king_coords,king):
-                mating.append(move)
+        if moves:
+            for move in moves:
+                if move == king_coords:
+                    continue
+                sub = copy.deepcopy(self)
+                sub.move_piece(coords,move)
+                if sub.check_mate(king_coords,king):
+                    mating.append(move)
         return mating
 
 b = Board()
@@ -301,14 +302,19 @@ print(crtochs(b.get_mating_moves((1,6),(0,7))))
 
 b = Board()
 b.place_piece("q", "B7")
-b.place_piece("K", "A8")
+b.place_piece("K", "B8")
 b.place_piece("k", "D7")
 
 print(b)
-print(crtochs(b.get_mating_moves("D7", "A8")))
+print(crtochs(b.get_mating_moves("D7", "B8")))
 
+b = Board()
+b.place_piece("q", "B7")
+b.place_piece("K", "B8")
+b.place_piece("k", "D1")
 
-
+print(b)
+print(crtochs(b.get_mating_moves("D7", "B8")))
 
 
 
