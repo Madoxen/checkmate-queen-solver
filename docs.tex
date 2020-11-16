@@ -3,6 +3,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[polish]{babel}
 \usepackage[margin=0.5in]{geometry}
+\usepackage{graphicx}
+\graphicspath{ {./gfx/} }
+
 
 \title{Matowanie Hetmanem}
 \author{Bartłomiej Meller\and Paweł Chłąd}
@@ -11,20 +14,48 @@
 \begin{document}
 
 \maketitle
+
+
+\section{Założenia}
+Założeniem Programu jest znajdywanie mata w jednym ruchu dla dwóch króli i hetmana obecnego na szachownicy.
+
+
 \section{Instrukcja obsługi}
 
 Importujemy moduł klasę "Board"
 
-INKLUDEGRAFIK
+\begin{center}
+    \includegraphics{1}
+\end{center}
+
+Tworzymy obiekt szachownicy
+
+\begin{center}
+    \includegraphics{2}
+\end{center}
 
 
-\section{Zasoby}
+Ustawiamy figury (figura, pole)
+
+\begin{center}
+    \includegraphics{3}
+\end{center}
+
+
+Sprawdzamy ruchy matujące (figura matująca, matowany król)
+
+\begin{center}
+    \includegraphics{4}
+\end{center}
+
+
+Wypisujemy szachownicę i listę ruchów matujących
+
+\section{Stos Technologiczny}
 
 \begin{itemize}
-\item \href{https://trello.com/invite/b/Kecr8XO8/1945d2bb0b8070f169f0d4e708994033/game-of-life}{\textbf{Trello} [KLIK]}
 
-\item \href{https://github.com/MellerB/IO-game-of-life}{\textbf{GitHub} [KLIK]}
-
+\item{Python3.9}
 
 \end{itemize}
 
