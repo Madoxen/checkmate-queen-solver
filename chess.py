@@ -241,7 +241,7 @@ class Board:
         return False
 
     def __str__(self) -> str:
-        s = "   "
+        s = "\n   "
 
         for i in range(self.W):
             s += str(chr(i + 65)) + " "
@@ -284,23 +284,8 @@ class Board:
                 sub.move_piece(coords,move)
                 if sub.check_mate(king_coords,king):
                     mating.append(move)
-        return mating
+        return crtochs(mating)
 
-b = Board()
-b.place_piece("q", "B7")
-b.place_piece("K", "B8")
-b.place_piece("k", "D7")
-
-print(b)
-print(crtochs(b.get_mating_moves("D7", "B8")))
-
-b = Board()
-b.place_piece("q", "B7")
-b.place_piece("K", "B8")
-b.place_piece("k", "D1")
-
-print(b)
-print(crtochs(b.get_mating_moves("D7", "B8")))
 
 
 
