@@ -39,16 +39,18 @@ def crtochs(coords: (int, int) or List[Tuple[int, int]]) -> str or List[str]:
             l.append(crtochs(coords[i]))
         return l
 
-def chstocr(coord : str or List[str]) -> (int,int):
+
+def chstocr(coord: str or List[str]) -> (int, int):
     if type(coord) is str:
         if len(coord) > 2:
             raise Exception("Chess coords are 2 chars long")
-        return( ord(coord[0]) - 65 , int(coord[1]) - int('1'))
+        return(ord(coord[0]) - 65, int(coord[1]) - int('1'))
     elif type(coord) is list:
         l = []
         for c in coord:
             l.append(chstocr(c))
         return l
+
 
 class Piece:
     def __init__(self, piece_id: str, coords: (int, int)):
@@ -81,6 +83,8 @@ class Board:
             raise Exception('Piece position out of bounds')
         if self.data[x][y] != 0:
             raise Exception('Piece already exists at this position')
+        if piece_id == "k" and self.check_check(coords, "k"):
+            raise Exception('Illegal king position')
 
         p = Piece(piece_id, (x, y))
         self.data[x][y] = p
@@ -96,7 +100,7 @@ class Board:
         self.data[x][y].coords = (-1, -1)
         self.data[x][y] = 0
 
-    def move_piece(self, _from:(int,int), _to:(int,int)):
+    def move_piece(self, _from: (int, int), _to: (int, int)):
 
         if type(_from) is str:
             _from = chstocr(_from)
@@ -109,21 +113,21 @@ class Board:
             raise Exception('Invalid move for this piece')
         else:
             self.remove_piece(_from)
-            self.place_piece(t,_to)
+            self.place_piece(t, _to)
 
+    # TODO: Gets pieces that are on board
+    # Gets all pieces on board if king is set to ""
+    # Gets all pieces of given king if set to k or K
 
-    #TODO: Gets pieces that are on board
-    #Gets all pieces on board if king is set to ""
-    #Gets all pieces of given king if set to k or K
     def get_pieces(self, king: str = "") -> list:
         if king != "k" and king != "K" and king != "":
             king = ""
 
         l = []
         d = {
-            "K" : lambda x: x.isupper(),
-            "k" : lambda x: x.islower(),
-            "" : lambda x: True 
+            "K": lambda x: x.isupper(),
+            "k": lambda x: x.islower(),
+            "": lambda x: True
         }
 
         for i in range(self.W):
@@ -170,20 +174,20 @@ class Board:
         moves = []
         x = coords[0]
         y = coords[1]
-        
-        #remove king from board
+
+        # remove king from board
         king = self.data[x][y]
         self.remove_piece(coords)
-        #produce all contested squares
+        # produce all contested squares
         csqs = self.__produce_csqs(king.type)
-        #place king on it's square back again
-        self.place_piece(king.type, coords) 
+        # place king on it's square back again
+        self.place_piece(king.type, coords)
 
         # king can move 1 square in every direction, but cannot move on fields that will result in check
         for d in dirs.values():
-            nc = (d[0] + x, d[1] + y) #new coords
-            if nc not in csqs: 
-                if nc[0] > self.W-1 or nc[0] < 0 or nc[1] > self.H-1 or nc[1] < 0: #bound check
+            nc = (d[0] + x, d[1] + y)  # new coords
+            if nc not in csqs:
+                if nc[0] > self.W-1 or nc[0] < 0 or nc[1] > self.H-1 or nc[1] < 0:  # bound check
                     continue
                 moves.append(nc)
         return moves
@@ -211,7 +215,8 @@ class Board:
     # checks if check can occur with current game state on given position
     def __produce_csqs(self, king: str) -> bool:
         # get all pieces
-        pieces = self.get_pieces(king.swapcase()) #we want to get all possible moves, of the opposite side
+        # we want to get all possible moves, of the opposite side
+        pieces = self.get_pieces(king.swapcase())
         csqs = []
         for p in pieces:
             # get all contested squares
@@ -224,7 +229,7 @@ class Board:
                 csqs.extend(self.get_moves(p.coords))
         return csqs
 
-    def check_check(self, coords: (int,int), king:str):
+    def check_check(self, coords: (int, int), king: str):
         if type(coords) is str:
             coords = chstocr(coords)
         csqs = self.__produce_csqs(king)
@@ -246,32 +251,30 @@ class Board:
         for i in range(self.W):
             s += str(chr(i + 65)) + " "
         s += "\n   | | | | | | | |  "
-        
 
         for j in range(self.H-1, -1, -1):
             s += "\n"
             s += str(j+1) + "--"
             for i in range(self.W):
-                s += str( self.data[i][j] )
-                if i<self.W-1:
-                    s+=" "
-            s += "--" + str(j+1) 
+                s += str(self.data[i][j])
+                if i < self.W-1:
+                    s += " "
+            s += "--" + str(j+1)
 
         s += "\n   | | | | | | | |\n   "
         for i in range(self.W):
             s += str(chr(i + 65)) + " "
-        
+
         return s + "\n"
 
-
-    def get_mating_moves(self, coords: (int, int), king_coords: (int,int)):
+    def get_mating_moves(self, coords: (int, int), king_coords: (int, int)):
         if type(coords) is str:
             coords = chstocr(coords)
         if type(king_coords) is str:
             king_coords = chstocr(king_coords)
 
         moves = self.get_moves(coords)
-        king=self.data[king_coords[0]][king_coords[1]].type
+        king = self.data[king_coords[0]][king_coords[1]].type
         if king != "k" and king != "K":
             raise Exception('provided king is not a king')
 
@@ -281,11 +284,7 @@ class Board:
                 if move == king_coords:
                     continue
                 sub = copy.deepcopy(self)
-                sub.move_piece(coords,move)
-                if sub.check_mate(king_coords,king):
+                sub.move_piece(coords, move)
+                if sub.check_mate(king_coords, king):
                     mating.append(move)
         return crtochs(mating)
-
-
-
-

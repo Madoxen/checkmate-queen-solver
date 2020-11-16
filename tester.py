@@ -2,7 +2,7 @@ from chess import *
 
 q = "C5"
 
-k = "A7"
+k = "A6"
 
 K = "A8"
 
